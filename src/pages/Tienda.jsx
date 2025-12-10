@@ -2,10 +2,12 @@ import { useContext, useState, useMemo } from "react";
 import Producto from "../components/Producto.jsx";
 import { CarritoContext } from "../context/carritoContext.jsx";
 import { ProductsContext } from "../context/productsContext.jsx";
+import { useAuth } from "../context/authContext.jsx";
 
 const Tienda = () => {
   const { productos, cargando, error } = useContext(ProductsContext);
   const { agregarAlCarrito } = useContext(CarritoContext);
+  const { esAdmin } = useAuth();
 
   // ESTADOS DEL FILTRO
   const [busqueda, setBusqueda] = useState("");
@@ -97,6 +99,7 @@ const Tienda = () => {
               key={producto.id} 
               producto={producto}
               agregarAlCarrito={agregarAlCarrito}
+              esAdmin={esAdmin}
             />
           ))
         ) : (

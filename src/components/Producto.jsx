@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useCarrito } from "../context/carritoContext";
+import { ProductsContext } from "../context/productsContext";
 import { toast } from "react-toastify";
 import { FaCartPlus } from "react-icons/fa";
 
@@ -97,13 +98,24 @@ const Details = styled.div`
   transition: all 0.3s ease;
 `;
 
-export default function Producto({ producto }) {
-  const { agregarAlCarrito } = useCarrito();
+export default function Producto({ producto, esAdmin }) {
+  const { agregarAlCarrito, carrito } = useCarrito();
+  const { eliminarProducto } = useContext(ProductsContext);
   const [showDetails, setShowDetails] = useState(false);
+
+  const itemEnCarrito = carrito.find((p) => p.id === producto.id);
+  const cantidad = itemEnCarrito?.cantidad || 0;
 
   const handleAgregar = () => {
     agregarAlCarrito(producto);
     toast.success("Producto agregado");
+  };
+
+  const handleEliminar = async () => {
+    if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+
+    await eliminarProducto(producto.id);
+    toast.success("Producto eliminado");
   };
 
   return (
@@ -115,27 +127,49 @@ export default function Producto({ producto }) {
           <Title>{producto.nombre}</Title>
           <Price>${producto.precio}</Price>
 
-          {/* Botón de desplegable */}
           <ToggleBtn onClick={() => setShowDetails(!showDetails)}>
             {showDetails ? "Ocultar detalles" : "Ver detalles"}
           </ToggleBtn>
 
-          {/* Contenido expandible */}
           <Details show={showDetails}>
             <p>{producto.descripcion}</p>
-            <p><strong>Categoría:</strong> {producto.categoria}</p>
+            <p>
+              <strong>Categoría:</strong> {producto.categoria}
+            </p>
           </Details>
 
-          {/* Link a página del producto */}
           <OutlinedVioleta to={`/producto/${producto.id}`}>
             Ver página del producto
           </OutlinedVioleta>
 
-          {/* Botón agregar */}
-          <BtnVioleta onClick={handleAgregar} className="d-flex justify-content-center align-items-center gap-2">
+          <BtnVioleta
+            onClick={handleAgregar}
+            className="d-flex justify-content-center align-items-center gap-2"
+          >
             <FaCartPlus />
             Agregar al carrito
+            {cantidad > 0 && <span>({cantidad})</span>}
           </BtnVioleta>
+
+          {/* --- BOTONES PARA ADMIN --- */}
+          {esAdmin && (
+            <div className="d-flex justify-content-between mt-3">
+              <Link
+                to={`/admin/editar/${producto.id}`}
+                className="btn btn-warning w-50 me-2"
+              >
+                Editar
+              </Link>
+
+              <button
+                onClick={handleEliminar}
+                className="btn btn-danger w-50"
+              >
+                Eliminar
+              </button>
+            </div>
+          )}
+
         </div>
       </Card>
     </div>

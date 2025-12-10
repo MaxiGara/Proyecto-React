@@ -9,10 +9,11 @@ const EditarProducto = () => {
   const { setLoading, setError } = useUI();
 
   const [form, setForm] = useState({
-    title: "",
-    price: "",
-    description: "",
-    image: "",
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    imagen: "",
+    categoria: "",
   });
 
   useEffect(() => {
@@ -20,14 +21,21 @@ const EditarProducto = () => {
       try {
         setLoading(true);
 
-        const response = await fetch(`https://6923331809df4a492324a54b.mockapi.io/productos/${id}`);
+        const response = await fetch(
+          `https://6923331809df4a492324a54b.mockapi.io/productos/${id}`
+        );
 
-        if (!response.ok) {
-          throw new Error("No se pudo cargar el producto");
-        }
+        if (!response.ok) throw new Error("No se pudo cargar el producto");
 
         const data = await response.json();
-        setForm(data);
+
+        setForm({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio: data.precio,
+          imagen: data.imagen,
+          categoria: data.categoria,
+        });
       } catch (error) {
         setError(error.message);
       } finally {
@@ -51,15 +59,19 @@ const EditarProducto = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://6923331809df4a492324a54b.mockapi.io/productos/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        `https://6923331809df4a492324a54b.mockapi.io/productos/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            precio: Number(form.precio),
+          }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Error al actualizar el producto");
-      }
+      if (!res.ok) throw new Error("Error al actualizar el producto");
 
       navigate("/admin");
     } catch (error) {
@@ -73,55 +85,56 @@ const EditarProducto = () => {
     <div className="container mt-4">
       <h2>Editar Producto</h2>
 
-      <form onSubmit={handleSubmit} className="mt-3">
+      <form onSubmit={handleSubmit} className="mt-3" style={{ maxWidth: "400px" }}>
 
-        <div className="mb-3">
-          <label className="form-label">Título</label>
-          <input
-            type="text"
-            className="form-control"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <label className="form-label">Nombre</label>
+        <input
+          type="text"
+          className="form-control mb-2"
+          name="nombre"
+          value={form.nombre}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-3">
-          <label className="form-label">Precio</label>
-          <input
-            type="number"
-            className="form-control"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <label className="form-label">Precio</label>
+        <input
+          type="number"
+          className="form-control mb-2"
+          name="precio"
+          value={form.precio}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-3">
-          <label className="form-label">Descripción</label>
-          <textarea
-            className="form-control"
-            name="description"
-            rows="3"
-            value={form.description}
-            onChange={handleChange}
-          ></textarea>
-        </div>
+        <label className="form-label">Descripción</label>
+        <textarea
+          className="form-control mb-2"
+          name="descripcion"
+          rows="3"
+          value={form.descripcion}
+          onChange={handleChange}
+        ></textarea>
 
-        <div className="mb-3">
-          <label className="form-label">URL de Imagen</label>
-          <input
-            type="text"
-            className="form-control"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-          />
-        </div>
+        <label className="form-label">URL de Imagen</label>
+        <input
+          type="text"
+          className="form-control mb-2"
+          name="imagen"
+          value={form.imagen}
+          onChange={handleChange}
+        />
 
-        <button className="btn btn-primary">Guardar Cambios</button>
+        <label className="form-label">Categoría</label>
+        <input
+          type="text"
+          className="form-control mb-3"
+          name="categoria"
+          value={form.categoria}
+          onChange={handleChange}
+        />
+
+        <button className="btn btn-primary w-100">Guardar Cambios</button>
       </form>
     </div>
   );

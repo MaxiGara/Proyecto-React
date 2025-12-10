@@ -3,7 +3,6 @@ import { createContext, useState, useEffect, useContext } from "react";
 export const CarritoContext = createContext(null);
 
 export const CarritoProvider = ({ children }) => {
-
   const [carrito, setCarrito] = useState(() => {
     try {
       const raw = localStorage.getItem("carrito_vetshop");
@@ -48,6 +47,11 @@ export const CarritoProvider = ({ children }) => {
     0
   );
 
+  const totalItems = carrito.reduce(
+    (acc, p) => acc + (p.cantidad || 1),
+    0
+  );
+
   return (
     <CarritoContext.Provider
       value={{
@@ -56,6 +60,7 @@ export const CarritoProvider = ({ children }) => {
         eliminarDelCarrito,
         vaciarCarrito,
         total,
+        totalItems,
       }}
     >
       {children}
@@ -63,6 +68,4 @@ export const CarritoProvider = ({ children }) => {
   );
 };
 
-export const useCarrito = () => {
-  return useContext(CarritoContext);
-};
+export const useCarrito = () => useContext(CarritoContext);

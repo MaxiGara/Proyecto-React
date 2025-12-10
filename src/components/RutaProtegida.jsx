@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/authContext.jsx";
 
-export default function RutaProtegida({ requiereAdmin = false, children }) {
+const RutaProtegida = ({ children, requiereAdmin = false }) => {
   const { usuario } = useAuth();
 
   if (!usuario) {
@@ -13,4 +13,6 @@ export default function RutaProtegida({ requiereAdmin = false, children }) {
   }
 
   return children;
-}
+};
+
+export default RutaProtegida;

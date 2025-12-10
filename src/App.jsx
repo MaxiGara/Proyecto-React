@@ -4,13 +4,12 @@ import Layout from "./layout/Layout";
 import Inicio from "./pages/Inicio";
 import Tienda from "./pages/Tienda";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import Carrito from "./pages/carritoPage";
 import DetalleProducto from "./pages/detalleProducto";
 
 import CrearProducto from "./pages/crearProducto";
 import EditarProducto from "./pages/editarProducto";
-import ProductosAdmin from "./pages/admin/productosAdmin";
+import ProductosAdmin from "./pages/adminProductos";
 
 import Login from "./pages/Login";
 import RutaProtegida from "./components/RutaProtegida";
@@ -65,7 +64,6 @@ function App() {
           </Route>
         </Routes>
 
-        <Footer />
       </Router>
     </>
   );

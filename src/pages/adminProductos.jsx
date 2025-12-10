@@ -1,73 +1,73 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { ProductsContext } from "../context/productsContext";
 
-const AdminProductos = () => {
-  const [productos, setProductos] = useState([]);
+const ProductosAdmin = () => {
+  const { productos, eliminarProducto } = useContext(ProductsContext);
 
-  const cargarProductos = async () => {
-    const resp = await fetch("https://6923331809df4a492324a54b.mockapi.io/productos");
-    const data = await resp.json();
-    setProductos(data);
-  };
-
-  useEffect(() => {
-    cargarProductos();
-  }, []);
-
-  const eliminarProducto = async (id) => {
+  const handleDelete = async (id) => {
     const confirmar = confirm("¿Seguro que deseas eliminar este producto?");
     if (!confirmar) return;
 
-    try {
-      const resp = await fetch(`https://6923331809df4a492324a54b.mockapi.io/productos/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!resp.ok) throw new Error("Error al eliminar");
-
-      alert("Producto eliminado");
-
-      // Actualiza la lista sin recargar
-      setProductos(productos.filter((p) => p.id !== id));
-    } catch (err) {
-      alert("No se pudo eliminar el producto");
-    }
+    await eliminarProducto(id);
+    alert("Producto eliminado");
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Administrar Productos</h2>
+    <div className="container py-4">
 
-      <Link to="/crear-producto">➕ Crear nuevo producto</Link>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="text-primary">Administrar Productos</h2>
+        <Link className="btn btn-success" to="/admin/crear">
+          ➕ Crear nuevo producto
+        </Link>
+      </div>
 
-      {productos.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <img src={p.imagen} width={60} />
-          <h3>{p.nombre}</h3>
-          <p>${p.precio}</p>
-          <p>Categoría: {p.categoria}</p>
+      {/* Lista de productos */}
+      <div className="row">
+        {productos.map((p) => (
+          <div className="col-md-4 mb-4" key={p.id}>
+            <div className="card h-100 shadow-sm">
 
-          <Link to={`/editar-producto/${p.id}`}>
-            ✏️ Editar
-          </Link>
+              <img
+                src={p.imagen}
+                className="card-img-top"
+                style={{ height: "180px", objectFit: "contain" }}
+                alt={p.nombre}
+              />
 
-          <button
-            style={{ marginLeft: "10px" }}
-            onClick={() => eliminarProducto(p.id)}
-          >
-            🗑️ Eliminar
-          </button>
-        </div>
-      ))}
+              <div className="card-body">
+                <h5 className="card-title">{p.nombre}</h5>
+                <p className="card-text mb-1">💲 Precio: ${p.precio}</p>
+                <p className="card-text">📦 Categoría: {p.categoria}</p>
+
+                {p.descripcion && (
+                  <p className="text-muted" style={{ fontSize: "0.9rem" }}>
+                    {p.descripcion.substring(0, 60)}...
+                  </p>
+                )}
+              </div>
+
+              <div className="card-footer d-flex justify-content-between">
+                <Link className="btn btn-warning btn-sm" to={`/admin/editar/${p.id}`}>
+                  ✏️ Editar
+                </Link>
+
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDelete(p.id)}
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 };
 
-export default AdminProductos;
+export default ProductosAdmin;

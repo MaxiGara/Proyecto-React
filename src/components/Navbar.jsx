@@ -1,20 +1,22 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
-import { FaShoppingCart, FaSignInAlt, FaSignOutAlt, FaStore } from "react-icons/fa";
+import { useCarrito } from "../context/carritoContext";
+import { FaShoppingCart, FaSignInAlt, FaSignOutAlt, FaStore, FaTools } from "react-icons/fa";
 
 export default function Navbar() {
   const { usuario, logout } = useAuth();
+  const { carrito } = useCarrito();
+
+  const totalItems = carrito.reduce((acc, p) => acc + p.cantidad, 0);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
       <div className="container">
 
-        {/* Logo */}
         <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-          <FaStore /> VetShop
+          <FaStore /> VetyShop
         </Link>
 
-        {/* BOTÓN HAMBURGUESA */}
         <button
           className="navbar-toggler"
           type="button"
@@ -24,26 +26,36 @@ export default function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Contenedor del menú */}
         <div className="collapse navbar-collapse" id="menu">
           <ul className="navbar-nav ms-auto">
 
-            {/* Productos */}
             <li className="nav-item">
               <Link className="nav-link d-flex align-items-center gap-1" to="/tienda">
                 <FaStore /> Productos
               </Link>
             </li>
 
-            {/* Carrito (solo si hay usuario) */}
-            {usuario && (
+            <li className="nav-item">
+              <Link
+                className="nav-link d-flex align-items-center gap-2 position-relative"
+                to="/carrito"
+              >
+                <FaShoppingCart />
+                Carrito
+                {totalItems > 0 && (
+                  <span className="badge bg-primary ms-1">{totalItems}</span>
+                )}
+              </Link>
+            </li>
+
+            {/* Entrada al panel admin */}
+            {usuario?.role === "admin" && (
               <li className="nav-item">
                 <Link
-                  className="nav-link d-flex align-items-center gap-1"
-                  to="/carrito"
-                  aria-label="Ir al carrito"
+                  className="nav-link d-flex align-items-center gap-1 text-warning"
+                  to="/admin"
                 >
-                  <FaShoppingCart /> Carrito
+                  <FaTools /> Admin
                 </Link>
               </li>
             )}
@@ -51,11 +63,7 @@ export default function Navbar() {
             {/* Login / Logout */}
             {!usuario ? (
               <li className="nav-item">
-                <Link
-                  className="nav-link d-flex align-items-center gap-1"
-                  to="/login"
-                  aria-label="Iniciar sesión"
-                >
+                <Link className="nav-link d-flex align-items-center gap-1" to="/login">
                   <FaSignInAlt /> Login
                 </Link>
               </li>
@@ -64,7 +72,6 @@ export default function Navbar() {
                 <button
                   className="btn btn-danger btn-sm ms-3 d-flex align-items-center gap-1"
                   onClick={logout}
-                  aria-label="Cerrar sesión"
                 >
                   <FaSignOutAlt /> Logout
                 </button>
